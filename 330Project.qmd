@@ -30,7 +30,7 @@ data = select(data, -1:-5)
 
 
 corrplot(cor(data), "circle")
-
+ggpairs(data, columns = c(1,2:ncol(data)))
 ```
 
 You can add options to executable code like this
