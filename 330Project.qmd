@@ -1,0 +1,74 @@
+---
+title: "330 Project"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+library(multcomp)
+library(dplyr)
+library(tidyverse)
+library("corrplot")
+library(caret)
+library(ggplot2)
+library(ggfortify)
+library(GGally) 
+```
+
+```{r}
+data = read.csv("C:\\Users\\Trumm\\OneDrive\\Desktop\\possum.csv", sep =",")
+data = data.frame(data)
+data = select(data, -1:-5)
+
+
+corrplot(cor(data), "circle")
+
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+
+ggplot(data = data, 
+       mapping = aes(x = hdlngth, 
+                     y = totlngth, color = sex)) + geom_point()
+
+
+ggplot(data = data, 
+       mapping = aes(x = hdlngth, 
+                     y = totlngth, color = Pop)) + geom_point()
+```
+
+```{r}
+#data$sex2 = ifelse(data$sex == "f", 1,0)
+data = read.csv("C:\\Users\\Trumm\\OneDrive\\Desktop\\possum.csv", sep =",")
+data = data.frame(data)
+data = select(data, -1)
+sex_model <- model.matrix(~ 0 + sex, data)
+pop_model <- model.matrix(~ 0 + Pop, data)
+data <- cbind(data[, -which(names(data) %in% c("sex", "Pop"))], sex_model, pop_model)
+
+
+linReg = lm(totlngth ~ hdlngth + sexf +sexm,  data = data)
+print(summary(linReg))
+ggplot(data) +
+  geom_point(aes(x = hdlngth, y = totlngth, color = factor(sexf))) +
+  geom_line(aes(x = hdlngth, y = predict(linReg), color = factor(sexf)), data = data) +
+  theme(aspect.ratio = 1)
+
+linReg = lm(totlngth ~ hdlngth + Popother +PopVic,  data = data)
+print(summary(linReg))
+ggplot(data) +
+  geom_point(aes(x = hdlngth, y = totlngth, color = factor(PopVic))) +
+  geom_line(aes(x = hdlngth, y = predict(linReg), color = factor(PopVic)), data = data) +
+  theme(aspect.ratio = 1)
+```
