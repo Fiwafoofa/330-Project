@@ -23,79 +23,66 @@ library(ggplot2)
 library(ggfortify)
 library(GGally) 
 library(glmnet)
+library(bestglm)
+
 ```
 
 You can add options to executable code like this
 
 ```{r}
-#General data plots not super needed
-data = read.csv("possum.csv", sep =",")
-data = data.frame(data)
-data = select(data, -1)
-data = na.omit(data)
-sex_model <- model.matrix(~ 0 + sex, data)
-pop_model <- model.matrix(~ 0 + Pop, data)
-data <- cbind(data[, -which(names(data) %in% c("sex", "Pop"))], sex_model, pop_model)
-
-linReg = lm(totlngth ~ hdlngth + sexf +sexm,  data = data)
-print(summary(linReg))
-ggplot(data) +
-  geom_point(aes(x = hdlngth, y = totlngth, color = factor(sexf))) +
-  geom_line(aes(x = hdlngth, y = predict(linReg), color = factor(sexf)), data = data) +
-  theme(aspect.ratio = 1)
-
-linReg = lm(totlngth ~ hdlngth + Popother +PopVic,  data = data)
-print(summary(linReg))
-ggplot(data) +
-  geom_point(aes(x = hdlngth, y = totlngth, color = factor(PopVic))) +
-  geom_line(aes(x = hdlngth, y = predict(linReg), color = factor(PopVic)), data = data) +
-  theme(aspect.ratio = 1)
-
-corrplot(cor(data), "circle")
-
-```
-
-```{r}
+#Read in data, drop Nan values, reorder columns to work for variable selection methods, dropped "row number" column
+set.seed(80085)
 data = read.csv("possum.csv", sep =",")
 data = data.frame(data)
 data = na.omit(data)
 data = data[,-1]
-data$sex = as.factor(data$sex)
-data$Pop = as.factor(data$Pop)
-data = data %>% relocate(sex)
 data$Pop = factor(data$Pop, levels =c("other","Vic"))
+data$sex = factor(data$sex, levels =c("m","f"))
+data = data %>% relocate(totlngth, .after = belly)
 X=as.matrix(data[, 2:13])
-y=as.numeric(data$sex)-1
-
+y=(data$totlngth)
 ```
 
 ```{r}
-#check assumptions
-
-jitter1 = ggplot(data = data)+geom_point(mapping = aes(x = age, y = sex))+geom_jitter(mapping = aes(x = age, y = sex))
-
-jitter2 = ggplot(data = data)+geom_point(mapping = aes(x = hdlngth, y = sex))+geom_jitter(mapping = aes(x = hdlngth, y = sex))
-
-jitter3 = ggplot(data = data)+geom_point(mapping = aes(x = totlngth, y = sex))+geom_jitter(mapping = aes(x = totlngth, y = sex))
-
-jitter4 = ggplot(data = data)+geom_point(mapping = aes(x = eye, y = sex))+geom_jitter(mapping = aes(x = eye, y = sex))
-
-jitter5 = ggplot(data = data)+geom_point(mapping = aes(x = skullw, y = sex))+geom_jitter(mapping = aes(x = skullw, y = sex))
-jitter6 = ggplot(data = data)+geom_point(mapping = aes(x = taill, y = sex))+geom_jitter(mapping = aes(x = taill, y = sex))
-
-grid.arrange(jitter1,jitter2,jitter3,jitter4,jitter5,jitter6, ncol =3)
+#We need to check assumptions, X and Y are linear, residuals have equal variance, residuals are normally distributed/shapiro wilks test qqplot, outliers
 ```
 
 ```{r}
-scatter.smooth(x= data$age,y=y )
-scatter.smooth(x= data$skullw,y=y )
-scatter.smooth(x= data$taill,y=y )
-scatter.smooth(x= data$hdlngth,y=y )
+# Below are all the variable selection methods, need to determine what critera we want to use AIC or BIC and potenially just fit models with each methods variables and compare them
+aic_model = bestglm(data, IC = "AIC", method = "exhaustive")
+bic_model = bestglm(data, IC = "BIC", method = "exhaustive")
+summary(aic_model$BestModel)
+summary(bic_model$BestModel)
 ```
 
 ```{r}
-#variable selection
-set.seed(80085)
+base = lm(totlngth ~ 1, data = data)
+final = lm(totlngth ~ . , data = data)
+forward_step = step(base,direction = "forward",k = log(nrow(data)),,scope = list(lower= base, upper = final))
+summary(forward_step)
+```
+
+```{r}
+back_step = step(final ,direction = "backward", k =log(nrow(data)),scope = list(lower= base, upper = final))
+summary(back_step)
+```
+
+```{r}
+
+bic = step(final ,direction = "both", k =log(nrow(data)),scope=list(lower= base, upper= final))
+bic_inter = step(base, direction = "both", k = log(nrow(bodyfat)),scope=list(lower= base, upper= final))
+aic_step = step(final ,direction = "both",scope=list(lower= base, upper= final))
+aic_inter = step(base ,direction = "both",scope=list(lower= base, upper= final))
+print(summary(bic_inter))
+```
+
+```{r}
+net =cv.glmnet(x = X, y= y, type.measure = "mse", alpha =.5)
+out = (coef(net, s="lambda.1se"))
+print(out)
+```
+
+```{r}
 env_lasso_cv=cv.glmnet(x = X,
                           y = y,
                           type.measure = "mse",
@@ -104,21 +91,6 @@ coef(env_lasso_cv, s = "lambda.min")
 ```
 
 ```{r}
-#model fitting
-dlog <- glm(sex ~ hdlngth + totlngth + eye + age +chest + belly, data = data, family = binomial(link = "logit"))
-summary(dlog)
-
-predicted_values = predict(dlog, type = "response")
-possible_cutoffs <- seq(0, 1, by = .01)
-
-classification_score = rep(NA,length(possible_cutoffs))
-
-for (i in 1:length(possible_cutoffs)){
-  classification = ifelse(predicted_values > possible_cutoffs[i],1,0) 
-  classification_score[i] = mean(classification != data$sex)
-}
-
-classified = data.frame(cbind(classification_score, possible_cutoffs))
-ggplot(data = classified) +
-  geom_line(aes(x = possible_cutoffs, y = classification_score))
+linReg= lm(totlngth ~ site + hdlngth+taill+footlgth+chest, data = data)
+summary(linReg)
 ```
