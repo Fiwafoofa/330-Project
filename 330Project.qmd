@@ -16,7 +16,7 @@ library(ggfortify)
 library(GGally) 
 library(glmnet)
 library(bestglm)
-
+library(car) # for avPlots
 ```
 
 # Read Code
@@ -27,8 +27,6 @@ set.seed(80085)
 data = read.csv("possum.csv", sep =",")
 data = data.frame(data)
 data = na.omit(data)
-print(sum(is.na(data)))
-
 data = data[,-1]
 data$Pop = factor(data$Pop, levels =c("other","Vic"))
 data$sex = factor(data$sex, levels =c("m","f"))
@@ -48,47 +46,33 @@ summary(bic_model$BestModel)
 ```
 
 ```{r}
-#Best AIC value is 161, with  hdlngth,taill,site as the variables
 base = lm(totlngth ~ 1, data = data)
 final = lm(totlngth ~ . , data = data)
-forward_step = step(base,direction = "forward",k = log(nrow(data)),scope = list(lower= base, upper = final))
-print(forward_step)
+forward_step = step(base,direction = "forward",k = log(nrow(data)),,scope = list(lower= base, upper = final))
+summary(forward_step)
 ```
 
 ```{r}
-#returns the same as forward selection, AIc 161 and same variables
 back_step = step(final ,direction = "backward", k =log(nrow(data)),scope = list(lower= base, upper = final))
-print(back_step)
+summary(back_step)
 ```
 
 ```{r}
-#AIC:160, totlngth ~ site + hdlngth + taill
+
 bic = step(final ,direction = "both", k =log(nrow(data)),scope=list(lower= base, upper= final))
-
-#AIC: 165, totlngth ~ hdlngth + taill + site
 bic_inter = step(base, direction = "both", k = log(nrow(bodyfat)),scope=list(lower= base, upper= final))
-
-#AIC: 150, totlngth ~ site + sex + hdlngth + taill
 aic_step = step(final ,direction = "both",scope=list(lower= base, upper= final))
-
-#AIC: 150, totlngth ~ hdlngth + taill + site
 aic_inter = step(base ,direction = "both",scope=list(lower= base, upper= final))
-
+print(summary(bic_inter))
 ```
 
 ```{r}
-#Elastic Net: site, hdlngth, taill, footlgth, chest 
-set.seed(69)
-X=as.matrix(data[, 1:12])
-y=(data$totlngth)
-net = cv.glmnet(x = X, y= y, type.measure = "mse", alpha =.5)
+net =cv.glmnet(x = X, y= y, type.measure = "mse", alpha =.5)
 out = (coef(net, s="lambda.1se"))
 print(out)
 ```
 
 ```{r}
-#Lasso: site,hdlngth, taill, footlngth, chest
-set.seed(69)
 env_lasso_cv=cv.glmnet(x = X,
                           y = y,
                           type.measure = "mse",
@@ -99,7 +83,7 @@ coef(env_lasso_cv, s = "lambda.min")
 # Fit Model
 
 ```{r}
-linReg= lm(totlngth ~ site + hdlngth + taill + footlgth + chest, data = data)
+linReg= lm(totlngth ~ site + hdlngth + taill, data = data)
 summary(linReg)
 
 data$residuals = linReg$residuals
@@ -136,13 +120,69 @@ ggplot(data = data) +
 #   geom_point(mapping = aes(x = <INSERT VAR HERE>, y = residuals)) +
 #   theme(aspect.ratio = 1)
 
+avPlots(linReg)
 
+autoplot(linReg, which = 1, ncol = 1, nrow = 1) +
+  theme(aspect.ratio = 1)
 ```
+
+Dang that's juicy. Lineariy probs met
 
 ## Independence
 
+idk
+
 ## Normality of Residuals
+
+```{r}
+hist(linReg$residuals)
+
+shapiro.test(linReg$residuals)
+
+# Q-Q Plot
+autoplot(linReg, which=2)
+```
+
+**Normality is NOT MET**
 
 ## Equal/Constant Variance
 
+```{r}
+autoplot(linReg, which = 3, nrow = 1, ncol = 1)
+autoplot(linReg, which = 1, nrow = 1, ncol = 1)
+```
+
+## Influential Points
+
+```{r}
+cd_cont_pos <- function(leverage, level, model) {sqrt(level*length(coef(model))*(1-leverage)/leverage)}
+
+cd_cont_neg <- function(leverage, level, model) {-cd_cont_pos(leverage, level, model)}
+
+cd_threshold <- 0.5
+autoplot(linReg, which = 5) +
+  stat_function(fun = cd_cont_pos,
+                args = list(level = cd_threshold, model = linReg),
+                xlim = c(0, 0.6), lty = 2, colour = "red") +
+  stat_function(fun = cd_cont_neg,
+                args = list(level = cd_threshold, model = linReg),
+                xlim = c(0, 0.6), lty = 2, colour = "red") +
+  scale_y_continuous(limits = c(-4, 4))
+```
+
 ## Multicollinearity
+
+```{r}
+super_vifs <- vif(linReg)
+super_vifs
+
+max(super_vifs)
+
+mean(super_vifs)
+```
+
+## FIX ASSUMPTIONS
+
+Make better:
+
+-   
