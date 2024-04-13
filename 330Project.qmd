@@ -27,6 +27,8 @@ set.seed(80085)
 data = read.csv("possum.csv", sep =",")
 data = data.frame(data)
 data = na.omit(data)
+print(sum(is.na(data)))
+
 data = data[,-1]
 data$Pop = factor(data$Pop, levels =c("other","Vic"))
 data$sex = factor(data$sex, levels =c("m","f"))
@@ -46,33 +48,47 @@ summary(bic_model$BestModel)
 ```
 
 ```{r}
+#Best AIC value is 161, with  hdlngth,taill,site as the variables
 base = lm(totlngth ~ 1, data = data)
 final = lm(totlngth ~ . , data = data)
-forward_step = step(base,direction = "forward",k = log(nrow(data)),,scope = list(lower= base, upper = final))
-summary(forward_step)
+forward_step = step(base,direction = "forward",k = log(nrow(data)),scope = list(lower= base, upper = final))
+print(forward_step)
 ```
 
 ```{r}
+#returns the same as forward selection, AIc 161 and same variables
 back_step = step(final ,direction = "backward", k =log(nrow(data)),scope = list(lower= base, upper = final))
-summary(back_step)
+print(back_step)
 ```
 
 ```{r}
-
+#AIC:160, totlngth ~ site + hdlngth + taill
 bic = step(final ,direction = "both", k =log(nrow(data)),scope=list(lower= base, upper= final))
+
+#AIC: 165, totlngth ~ hdlngth + taill + site
 bic_inter = step(base, direction = "both", k = log(nrow(bodyfat)),scope=list(lower= base, upper= final))
+
+#AIC: 150, totlngth ~ site + sex + hdlngth + taill
 aic_step = step(final ,direction = "both",scope=list(lower= base, upper= final))
+
+#AIC: 150, totlngth ~ hdlngth + taill + site
 aic_inter = step(base ,direction = "both",scope=list(lower= base, upper= final))
-print(summary(bic_inter))
+
 ```
 
 ```{r}
-net =cv.glmnet(x = X, y= y, type.measure = "mse", alpha =.5)
+#Elastic Net: site, hdlngth, taill, footlgth, chest 
+set.seed(69)
+X=as.matrix(data[, 1:12])
+y=(data$totlngth)
+net = cv.glmnet(x = X, y= y, type.measure = "mse", alpha =.5)
 out = (coef(net, s="lambda.1se"))
 print(out)
 ```
 
 ```{r}
+#Lasso: site,hdlngth, taill, footlngth, chest
+set.seed(69)
 env_lasso_cv=cv.glmnet(x = X,
                           y = y,
                           type.measure = "mse",
