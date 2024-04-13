@@ -4,14 +4,6 @@ format: html
 editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
 library(gridExtra)
 library(multcomp)
@@ -27,7 +19,7 @@ library(bestglm)
 
 ```
 
-You can add options to executable code like this
+# Read Code
 
 ```{r}
 #Read in data, drop Nan values, reorder columns to work for variable selection methods, dropped "row number" column
@@ -43,9 +35,7 @@ X=as.matrix(data[, 2:13])
 y=(data$totlngth)
 ```
 
-```{r}
-#We need to check assumptions, X and Y are linear, residuals have equal variance, residuals are normally distributed/shapiro wilks test qqplot, outliers
-```
+# Variable Selection
 
 ```{r}
 # Below are all the variable selection methods, need to determine what critera we want to use AIC or BIC and potenially just fit models with each methods variables and compare them
@@ -90,7 +80,53 @@ env_lasso_cv=cv.glmnet(x = X,
 coef(env_lasso_cv, s = "lambda.min")
 ```
 
+# Fit Model
+
 ```{r}
-linReg= lm(totlngth ~ site + hdlngth+taill+footlgth+chest, data = data)
+linReg= lm(totlngth ~ site + hdlngth + taill + footlgth + chest, data = data)
 summary(linReg)
+
+data$residuals = linReg$residuals
 ```
+
+# Check Assumptions
+
+## Linearity
+
+```{r}
+# plot(data) Useless
+# site + hdlngth + taill + footlgth + chest
+ggplot(data = data) +
+  geom_point(mapping = aes(x = site, y = residuals)) +
+  theme(aspect.ratio = 1)
+
+ggplot(data = data) +
+  geom_point(mapping = aes(x = hdlngth, y = residuals)) +
+  theme(aspect.ratio = 1)
+
+ggplot(data = data) +
+  geom_point(mapping = aes(x = taill, y = residuals)) +
+  theme(aspect.ratio = 1)
+
+ggplot(data = data) +
+  geom_point(mapping = aes(x = footlgth, y = residuals)) +
+  theme(aspect.ratio = 1)
+
+ggplot(data = data) +
+  geom_point(mapping = aes(x = chest, y = residuals)) +
+  theme(aspect.ratio = 1)
+ 
+# ggplot(data = data) +
+#   geom_point(mapping = aes(x = <INSERT VAR HERE>, y = residuals)) +
+#   theme(aspect.ratio = 1)
+
+
+```
+
+## Independence
+
+## Normality of Residuals
+
+## Equal/Constant Variance
+
+## Multicollinearity

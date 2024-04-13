@@ -1,0 +1,32 @@
+---
+title: "cooler"
+format: html
+editor: visual
+---
+
+### Load libraries
+
+```{r}
+library(corrplot)
+```
+
+### Get the data
+
+```{r}
+possum_data <- read.csv("possum.csv", header = TRUE)
+head(possum_data)
+```
+
+See https://www.kaggle.com/datasets/abrambeyer/openintro-possum for information about the columns and the units.
+
+### EDA
+
+### Check Assumptions
+
+### Variable Selection
+
+### Fit Model
+
+### Explore Model (predictions, confidence intervals, etc.)
+
+### Summary
