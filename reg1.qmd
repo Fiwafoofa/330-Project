@@ -82,6 +82,7 @@ data$fitted = multReg$fitted.values
 ```{r}
 #VIF all look normal
 vif_values <- car::vif(multReg)
+print(mean(vif_values))
 print(vif_values)
 ```
 
