@@ -13,6 +13,16 @@ Quarto enables you to weave together content and executable code into a finished
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r}
+library(bestglm)
+
+library(dplyr)
+library(gridExtra)
+library("corrplot")
+library(caret)
+library(ggplot2)
+library(ggfortify)
+library(car) # for avPlots
+
 #basic reading file and plotting varaibales
 set.seed(80085)
 data = read.csv("possum.csv", sep =",")
@@ -21,6 +31,8 @@ data = na.omit(data)
 data = data[,-1]
 data$Pop = factor(data$Pop, levels =c("other","Vic"))
 data$sex = factor(data$sex, levels =c("m","f"))
+data$site = factor(data$site, levels =c("1","2","3","4","5","6","7","8","9","10"))
+
 data = data %>% relocate(totlngth, .after =belly)
 y=(data$sex)
 X=as.matrix(data[, 2:13])
@@ -47,14 +59,21 @@ ggplot(data = data,
 ```
 
 ```{r}
+aic_model = bestglm(data, IC = "AIC", method = "exhaustive")
+bic_model = bestglm(data, IC = "BIC", method = "exhaustive")
+summary(aic_model$BestModel)
+summary(bic_model$BestModel)
+```
+
+```{r}
 #correlation matrix, sexm and sexf are categorical so they are fine
-data_dummies <- model.matrix(~ site + sex + hdlngth + taill - 1, data = data)
+data_dummies <- model.matrix(~ chest + hdlngth + taill - 1, data = data)
 corrplot(cor(data_dummies))
 ```
 
 ```{r}
 #model fitting and saving resiudals and fitted values
-multReg = lm(totlngth ~ site+ sex +hdlngth+ taill, data = data)
+multReg = lm(totlngth ~ site+ chest +hdlngth+ taill, data = data)
 summary(multReg)
 data$Residuals = multReg$residuals
 data$fitted = multReg$fitted.values
@@ -90,7 +109,7 @@ ggplot(data = data) +
 #Plot the resiudals and their linearity
 #Also ploted the 4 other plots we alwasy do
 sex<-ggplot(data = data) +
-  geom_point(mapping = aes(x = sex, y = Residuals)) +
+  geom_point(mapping = aes(x = chest, y = Residuals)) +
   theme(aspect.ratio = 1)
 
 site<-ggplot(data = data) +
@@ -131,13 +150,13 @@ print(confint(multReg, level =0.95))
 ```
 
 ```{r}
-#testing if the sex of a possum is sex has statistically significant effect on total length
-noGroup = lm(totlngth ~ site +hdlngth+taill , data = data)
+#testing if the site of a possum  has statistically significant effect on total length
+noGroup = lm(totlngth ~ chest +hdlngth+taill , data = data)
 anova(multReg, noGroup)
 ```
 
 ```{r}
-#Testing the interaction term between sex and the head length variable seems to be statsitcally sig
+#Testing the interaction term between sex and the head length variable seems to be not statsitcally sig
 data$sexm = ifelse(data$sex == "m", 1,0)
 data$sexf = ifelse(data$sex == "f", 1,0)
 interaction_model = lm(totlngth ~ site +sexf +sexm +hdlngth+ taill+ hdlngth:sexf +hdlngth:sexm, data = data)
@@ -148,5 +167,5 @@ anova(interaction_model, multReg)
 
 ```{r}
 #model is still dookie
-summary(interaction_model)
+summary(multReg)
 ```
