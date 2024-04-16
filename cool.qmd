@@ -52,13 +52,15 @@ Our data was collected by wildlife researchers, on Southern Victoria to central 
 
 Question 1: Does the site of a possum's capture have an effect on the total length of the possum.
 
-Question 2:
+Question 2: Is there any additional effect between the chest size and capture site that can explain any more of the data.
 
 ## 1.3 Regression Methods
 
 *For each question of interest listed in Section 2, describe what regression models, techniques, and tools you will use to fully answer it. These should include any plots you will use for exploratory analysis or diagnostic checks, as well as methods of inference you will use.*
 
-Question 1: To determine if the site of a possum's capture has an effect on the total length of the possum we implemented a multiple linear regression model. Using the site a possum was caught at, the chest size of the possum, the head length, the tail length. Using best subset with a metric of AIC as the variable selection method is how we determined which variables to build our model on. Since site is categorical variable we encode it as a factor and proceed to check assumptions.
+To determine if the site of a possum's capture has an effect on the total length of the possum we implemented a multiple linear regression model. Using the site a possum was caught at, the chest size of the possum, the head length, the tail length. Using best subset with a metric of AIC as the variable selection method is how we determined which variables to build our model on. Since site is categorical variable we encode it as a factor and proceed to check assumptions.
+
+Since the linear model we are going to be using to fit explore this data can be used to answer both questions we conduct the explorarity data analysis for both questions here.
 
 We first checked for multicolinearity using a correlation matrix, once satisfied that multicolinearty would not be an issue, we fit a tentative model and used it to find and save the residual values. Conducting a more thorough inspection of variables and their correlation we performed some variable inflation factor calculations. The mean of the VIFs was 1.90 and the max VIF was 2.08, both indicate that we can continue the analysis under the assumption that the no multicolinearity is met. Another assumption we check was that the residuals are normally distributed, creating a density plot we are able to see that they are shaped like a normal distribution, and continue noting that this assumption was met. We performed other checks on residuals as well and the accompanying plots are show below. Finally we checked for influential points, using a Cook's distance plot we were able to see that all data points were within bounds meaning that none of them could be considered influential.
 
@@ -108,6 +110,27 @@ autoplot(multReg, which = 5) +
 *Conduct the analysis in a logical fashion, including necessary code (and not any superfluous code) and its output. Give simple interpretations of your findings related to the questions of interest.*
 
 Question 1:
+
+```{r}
+#confidence intervals of model
+print(confint(multReg, level =0.95))
+multReg = lm(totlngth ~ site+ chest +hdlngth+ taill, data = data)
+noGroup = lm(totlngth ~ chest + hdlngth+ taill , data = data)
+anova(multReg, noGroup)
+
+```
+
+```{r}
+data$sexm = ifelse(data$sex == "m", 1,0)
+data$sexf = ifelse(data$sex == "f", 1,0)
+
+sex_model = lm(totlngth ~ hdlngth+ taill + chest +site +sexm, data = data)
+
+
+print(confint(sex_model, level =0.95))
+
+anova(multReg,sex_model)
+```
 
 # 3 Conclusions
 
