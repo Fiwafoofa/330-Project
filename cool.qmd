@@ -52,7 +52,7 @@ Our data was collected by wildlife researchers, on Southern Victoria to central 
 
 Question 1: Does the site of a possum's capture have an effect on the total length of the possum.
 
-Question 2: Is there any additional effect between the chest size and capture site that can explain any more of the data.
+Question 2: Is there a difference between using a the site a possum was captured at compared to the population the possum belongs to.
 
 ## 1.3 Regression Methods
 
@@ -64,7 +64,7 @@ Since the linear model we are going to be using to fit explore this data can be 
 
 We first checked for multicolinearity using a correlation matrix, once satisfied that multicolinearty would not be an issue, we fit a tentative model and used it to find and save the residual values. Conducting a more thorough inspection of variables and their correlation we performed some variable inflation factor calculations. The mean of the VIFs was 1.90 and the max VIF was 2.08, both indicate that we can continue the analysis under the assumption that the no multicolinearity is met. Another assumption we check was that the residuals are normally distributed, creating a density plot we are able to see that they are shaped like a normal distribution, and continue noting that this assumption was met. We performed other checks on residuals as well and the accompanying plots are show below. Finally we checked for influential points, using a Cook's distance plot we were able to see that all data points were within bounds meaning that none of them could be considered influential.
 
-```{r}
+```{r, echo = FALSE}
 data = read.csv("possum.csv", sep =",")
 data = data.frame(data)
 data = na.omit(data)
@@ -109,9 +109,11 @@ autoplot(multReg, which = 5) +
 
 *Conduct the analysis in a logical fashion, including necessary code (and not any superfluous code) and its output. Give simple interpretations of your findings related to the questions of interest.*
 
-Question 1:
+We conducted an anova test to see how if the inclusion of Population and Site variables were producing statically significant different models. Essentially, we were checking to see how the addition of a categorical variable was affecting the model. We tested models that included either Site or Population as their categorical variable, for the model that contained site our anova produced a p-value of $7.604e^{-11}$ . What that means is that the inclusion of Site in our model along with Chest, Head Length, and Tail length, that Site is a statstically significant predictor variable. Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$. Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable.
 
-```{r}
+To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ . Which indicates that the difference between models is statically significant at an alpha level of 0.05
+
+```{r,echo = FALSE}
 #confidence intervals of model
 print(confint(multReg, level =0.95))
 multReg = lm(totlngth ~ site+ chest +hdlngth+ taill, data = data)
@@ -120,16 +122,20 @@ anova(multReg, noGroup)
 
 ```
 
-```{r}
+```{r, echo = FALSE}
 data$sexm = ifelse(data$sex == "m", 1,0)
 data$sexf = ifelse(data$sex == "f", 1,0)
+Pop_model_no_group = lm(totlngth ~ hdlngth+ taill, data = data)
+Pop_model = lm(totlngth ~ hdlngth+ taill +Pop, data = data)
+print(confint(Pop_model, level =0.95))
+anova(Pop_model_no_group,Pop_model)
 
-sex_model = lm(totlngth ~ hdlngth+ taill + chest +site +sexm, data = data)
+summary(Pop_model)
+```
 
+```{r}
+anova(multReg,Pop_model)
 
-print(confint(sex_model, level =0.95))
-
-anova(multReg,sex_model)
 ```
 
 # 3 Conclusions
