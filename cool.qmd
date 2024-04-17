@@ -40,6 +40,22 @@ Briefly state the source of your data and describe the relevant variables that *
 
 Our data was collected by wildlife researchers, on Southern Victoria to central Queensland
 
+| Variable | Description                                                                                                         |
+|------------------|------------------------------------------------------|
+| case     | Observation Number                                                                                                  |
+| site     | The site number where the possum was trapped                                                                        |
+| Pop      | Population: either Vic (Victoria) or other (New South Wales or Queensland)                                          |
+| sex      | Gender, either m (male) or f (female)                                                                               |
+| age      | Age (units unspecified, likely years)                                                                               |
+| hdlngth  | Head length in millimeters (mm)                                                                                     |
+| totlngth | Total length in centimeters (cm)                                                                                    |
+| taill    | Tail length in centimeters (cm)                                                                                     |
+| footlgth | Foot length (units unspecified)                                                                                     |
+| earconch | A measurement (units and dimensions not specified) of an the possum's ear conch (outer, shell-like part of the ear) |
+| eye      | A measurement (units and dimensions not specified) of a possum's eye)                                               |
+| chest    | A measurement (units and dimensions not specified) of a possum's chest)                                             |
+| belly    | A measurement (units and dimensions not specified) of a possum's belly)                                             |
+
 ## 1.2 Questions of Interest
 
 *Briefly and clearly state the two main questions that you will investigate throughout the report.*
@@ -52,11 +68,21 @@ Question 2: Is there a difference between using a the site a possum was captured
 
 ## 1.3 Regression Methods
 
-To determine if the site of a possum's capture has an effect on the total length of the possum we implemented a multiple linear regression model. Using the site a possum was caught at, the chest size of the possum, the head length, the tail length. Using best subset with a metric of AIC as the variable selection method is how we determined which variables to build our model on. Since site is categorical variable we encode it as a factor and proceed to check assumptions.
+To determine if the site of a possum's capture has an effect on the total length of the possum, a multiple linear regression model was fit using the *site* a possum was caught at, and the *chest* *size*, *head length*, and *tail length o*f a possum as predictor variables. The best subset variable selection method with the AIC metric was used to determined which variables to build the model on. Since *site* is categorical variable, it was encoded as a factor.
 
-Since the linear model we are going to be using to fit explore this data can be used to answer both questions we conduct the exploratory data analysis for both questions here.
+Since the linear model be used to explore this data can be used to answer both questions, exploratory data analysis on this data set and a model with the variables given above is discussed below.
 
-We first checked for multicolinearity using a correlation matrix, once satisfied that multicolinearty would not be an issue, we fit a tentative model and used it to find and save the residual values. Conducting a more thorough inspection of variables and their correlation we performed some variable inflation factor calculations. The mean of the VIFs was 1.90 and the max VIF was 2.08(see Figure 3), both indicate that we can continue the analysis under the assumption that the no multicolinearity is met. Another assumption we check was that the residuals are normally distributed, creating a density plot we are able to see that they are shaped like a normal distribution(see Figure 2), and continue noting that this assumption was met. We performed other checks on residuals as well and the accompanying plots are show below. Finally we checked for influential points, using a Cook's distance plot(see Figure 1) we were able to see that all data points were within bounds meaning that none of them could be considered influential.
+The first assumption checked will be that there is a linear relationship between the response variable (*total length* of the possum) and the predictor variables. Looking at the added-variable plots below, there is a somewhat strong linear relationship between each of the predictor variables and the response except for one predictor: *site 3*. Also looking at the residuals vs. fitted-values plot, each of the points are centered and normally distributed around zero. Although the one predictor with *site 3* is somewhat worrisome, for simplicity this assumption is likely met.
+
+Considering the independence between observations, not much information was disclosed about how the data was collected; however, what was said is this data came from ecological research for statistical analysis. Because of this, likely the data was collected in a professional way to ensure independence, so this assumption will likely be met.
+
+Next is the assumption that the residuals of the model are normally distributed. Looking at the histogram of residuals and the Shapiro Test, the histogram is normally distributed and the null hypothesis that the residuals are normally distributed is not rejected. This assumption is easily met.
+
+For the equal and constant variance assumption, looking at the scale-location plot, the line is somewhat straight and the points are evenly distributed across it. Additionally, looking at the Q-Q plot, most of points follow the diagonal line closely except for the lower theoretical quantiles. This is potentially concerning, but as most values follow diagonal line and the scale-location plot looks mostly good, this is assumption is likely met
+
+The first assumption checked is no multicollinearity among the predictor variables. The correlation matrix and VIFs were computed. In the correlation matrix, none of the variables have a higher correlation than `0.8`, which is ideal, and the mean and max of the VIFs was `1.90` and `2.08` respectively, which is less ideal but likely still good enough. The assumption is likely met and will not interfere much with the predictions of the model.
+
+Finally is the check for influential points. Looking at both residuals vs. leverage plots, all data points were within bounds (less than `0.5`), meaning that none of them could be considered influential.
 
 ```{r, echo = FALSE}
 data = read.csv("possum.csv", sep =",")
@@ -76,17 +102,15 @@ data$fitted = multReg$fitted.values
 autoplot(multReg)
 avPlots(multReg)
 
-
-
 ```
 
 # 2 Analyses, Results, and Interpretation
 
-To answer the initial questions we had about our data set we performed multiple different tests and analysis of our models . Where the Site model was a linear model that used Site, Chest, Head Length and Tail Length as predictor variables with the response variable being Total Length(see Figure 4). The Population model was a similar linear model that only used Population, Tail Length, and Head Length as predictors and Total Length as the response(see Figure 5).
+To answer the initial questions about our data set, an analysis and different tests on the models were performed using 2 different models with variations on those models. These two models are the Site model and Population model. The Site model was a linear model that used *site*, *chest*, *head length* and *tail length* as predictor variables with the response variable being Total Length. The Population model was a similar linear model that only used *population*, *tail length*, and *head length* as predictors and Total Length as the response.
 
-First we conducted an anova test to see how if the inclusion of Population and Site variables were producing statically significant different models. Essentially, we were checking to see how the addition of a categorical variable was affecting the model. We tested models that included either Site or Population as their categorical variable, for the model that contained site our anova produced a p-value of $7.604e^{-11}$ (see Figure 6). What that means is that the inclusion of Site in our model along with Chest, Head Length, and Tail length, that Site is a statistically significant predictor variable. Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$ (see Figure 7). Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable. The results of the anova tests are show below.
+First, an anova test was conducted to see how if the inclusion of the *population* and *site* variables were producing statically significant different models. In other words, checking to see how the addition of a categorical variable, *population* or *site*, was affecting the model. We tested models that included either Site or Population as their categorical variable. For the model that contained site our anova produced a p-value of $7.604e^{-11}$ suggesting that the inclusion of Site in our model (along with *chest*, *head* *length*, and *tail* *length*) is a statistically significant predictor variable. Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$. Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable. The results of the anova tests are show below.
 
-To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ (see Figure 9). Which indicates that the difference between models is statically significant at an alpha level of 0.05. The test is show below.
+To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ . Which indicates that the difference between models is statically significant at an alpha level of 0.05. The test is show below.
 
 Now that we have compared model we can look at how the actual models are structured. For this section we will compare the predictor variables that both models have(Tail Length and Head Length) and what effect they have have and compare the difference categorical variables make in the models.
 
@@ -96,9 +120,9 @@ With the Population model we can interpret the Tail Length as, holding all else 
 
 Lastly we have created 95% confidence intervals for both models, to help determine the effect of predictor variables even further.
 
-With the Site model having categorical variable with 6 levels we start there. Once again, we make a generalization of the results. With all of the site confidence interval being negative and all of them spanning a similar distance. We can assume,holding all else constant, with 95% confidence that the true value for each of the Sites is within the upper and lower bound of the confidence intervals produced below. We also see that none of the confidence intervals contain 0, which allows us to infer that the Site variable will always result in a decrease in the Total Length of a possum. We can further interpret the confidence interval for Head Length to mean that we are 95% confident that the true effect of increase in Head Length has on Total Length lies between 0.24512254 and 0.5585335. We are also 95% confident that holding all else constant the true effect of Tail Length on Total Length lies between 0.94229399 and 1.444456. We also are 95% confident that holding all else constant that the true effect of Chest on Total Length lies between -0.07118978 and 0.4579026. Since the confidence interval contains 0 we recognize that Chest might not have any statistically significant effect on Total Length, at the significance level of 5%.
+With the Site model having categorical variable with 6 levels we start there. Once again, we make a generalization of the results. With all of the site confidence interval being negative and all of them spanning a similar distance. We can assume,holding all else constant, with 95% confidence that the true value for each of the Sites is within the upper and lower bound of the confidence intervals produced below. We also see that none of the confidence intervals contain 0, which allows us to infer that the Site variable will always result in a decrease in the Total Length of a possum. We can further interpret the confidence interval for Tail Length as we are 95% confident that holding all else constant the true effect of Tail Length on Total Length lies between 0.94229399 and 1.444456. Lastly, we are 95% confident that holding all else constant that the true effect of Chest on Total Length lies between -0.07118978 and 0.4579026. Since the confidence interval contains 0 we recognize that Chest might not have any statistically significant effect on Total Length, at the significance level of 5%.
 
-Now we look at the Population model. We are 95% confident that holding all else constant that the true effect of Tail Length on Total Length is between 1.0799613 and 1.6158617. We are also 95% confident that holding all else constant the true effect of Head Length on Total Length is between 0.4395157 and 0.7030028. Finally we are 95% confident that holding all else constant that the true effect of a possum being part of the Vic Population has on the Total Length is between 2.5141664 and 4.5601573.
+Now we look at the Population model. We are 95% confident that holding all else constant that the true effect of Tail Length on Total Length is between 1.0799613 and 1.6158617. Finally we are 95% confident that holding all else constant that the true effect of a possum being part of the Vic Population has on the Total Length is between 2.5141664 and 4.5601573. We did not include confidence intervals for Head Length in the discussion, with Head Length being a predictor variable that had relativiely low effect on both models we excluded it. The intervals are still included in Figure 10 in the appendix.
 
 # 3 Conclusions
 
@@ -107,6 +131,8 @@ We have created all these models and scores and interpretations of models. If an
 Starting with the anova between models that either had or didn't have Site as a categorical predictor variable. The test resulted in a p-value well below the significance level of 0.05 which meant they were statically significantly different. Comparing the model summaries we saw when Site was included we had an $R^2 =.80$ compared to the other model which returned $R^2 = .64$ . Including the categorical variable of site allowed for us to explain roughly 16% more of the data. Additionally when comparing models where the categorical predictor variable was Site and Population we performed an anova test which returned results that indicated there was a statically significant difference. The Population model had an $R^2 =.73$ which compare to the aforementioned value of the Site model was lesser. We also compared the Site model's $Adjusted\ R^2 =.79$ with the Population's $Adjusted\ R^2 =.72$ . Using both those metrics the Site model was able to explain more of the data while still being better suited to generalize potential new data. We believe the reason for this difference most likely is related to the Site's possums were captured at. If a site had more food or a harsher environment it would make sense that the possums would be larger there, due to abundance of nutrients or to fend off predators. However, since we have no additional data we are merely speculating on the potential reason why Site as a predictor variable allowed models to perform better.
 
 There are some points we felt should be brought up as potentially concerning. Firstly, we wanted to try testing an interaction term between Population and Site, we were unable to do so as the multicolinearity between the two variables was unbelievably high. Also when constructing confidence intervals for the coefficients of the Site model zero was included in the interval for the Chest variable. This typically indicates that the variable is not statically significant in the model, but since the interval was only 0.07 below zero we determined that it was acceptable to keep it in our model.
+
+In summary, our study explored the influencing factors of a possums Total Length, specifically examining the capture site and sub population variables. Our analysis, using multiple linear regression models, uncovered insight into the relationship between these variables. The implications of the findings suggest that the environment and conditions of a
 
 # 4 Contributions
 
