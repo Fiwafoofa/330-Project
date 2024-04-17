@@ -41,7 +41,7 @@ Briefly state the source of your data and describe the relevant variables that *
 Our data was collected by wildlife researchers, on Southern Victoria to central Queensland
 
 | Variable | Description                                                                                                         |
-|------------------|------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | case     | Observation Number                                                                                                  |
 | site     | The site number where the possum was trapped                                                                        |
 | Pop      | Population: either Vic (Victoria) or other (New South Wales or Queensland)                                          |
@@ -57,10 +57,6 @@ Our data was collected by wildlife researchers, on Southern Victoria to central 
 | belly    | A measurement (units and dimensions not specified) of a possum's belly)                                             |
 
 ## 1.2 Questions of Interest
-
-*Briefly and clearly state the two main questions that you will investigate throughout the report.*
-
-*These questions should be stated in scientific, and not statistical language. For example, "Is the slope of log of per capita GDP significantly different from zero?" should instead by give as "Does the log of per capita GDP have an effect on the average life expectancy of females in a given country?"*
 
 Question 1: Does the site of a possum's capture have an effect on the total length of the possum.
 
@@ -106,9 +102,9 @@ avPlots(multReg)
 
 # 2 Analyses, Results, and Interpretation
 
-To answer the initial questions about our data set, an analysis and different tests on the models were performed using 2 different models with variations on those models. These two models are the Site model and Population model. The Site model was a linear model that used *site*, *chest*, *head length* and *tail length* as predictor variables with the response variable being Total Length. The Population model was a similar linear model that only used *population*, *tail length*, and *head length* as predictors and Total Length as the response.
+To answer the initial questions about our data set, an analysis and different tests on the models were performed using 2 different models with variations on those models. These two models are the Site model and Population model. The Site model was a linear model that used *site*, *chest*, *head length* and *tail length* as predictor variables with the response variable being Total Length(See Figure 4). The Population model was a similar linear model that only used *population*, *tail length*, and *head length* as predictors and Total Length as the response(See Figure 6).
 
-First, an anova test was conducted to see how if the inclusion of the *population* and *site* variables were producing statically significant different models. In other words, checking to see how the addition of a categorical variable, *population* or *site*, was affecting the model. We tested models that included either Site or Population as their categorical variable. For the model that contained site our anova produced a p-value of $7.604e^{-11}$ suggesting that the inclusion of Site in our model (along with *chest*, *head* *length*, and *tail* *length*) is a statistically significant predictor variable. Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$. Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable. The results of the anova tests are show below.
+First, an anova test was conducted to see how if the inclusion of the *population* and *site* variables were producing statically significant different models. In other words, checking to see how the addition of a categorical variable, *population* or *site*, was affecting the model. We tested models that included either Site or Population as their categorical variable. For the model that contained site our anova produced a p-value of $7.604e^{-11}$ suggesting that the inclusion of Site in our model (along with *chest*, *head* *length*, and *tail* *length*) is a statistically significant predictor variable(See Figure 5). Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$. Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable(See Figure 7). The results of the anova tests are show below.
 
 To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ . Which indicates that the difference between models is statically significant at an alpha level of 0.05. The test is show below.
 
