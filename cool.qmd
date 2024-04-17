@@ -109,38 +109,65 @@ autoplot(multReg, which = 5) +
 
 *Conduct the analysis in a logical fashion, including necessary code (and not any superfluous code) and its output. Give simple interpretations of your findings related to the questions of interest.*
 
-We conducted an anova test to see how if the inclusion of Population and Site variables were producing statically significant different models. Essentially, we were checking to see how the addition of a categorical variable was affecting the model. We tested models that included either Site or Population as their categorical variable, for the model that contained site our anova produced a p-value of $7.604e^{-11}$ . What that means is that the inclusion of Site in our model along with Chest, Head Length, and Tail length, that Site is a statstically significant predictor variable. Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$. Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable.
+To answer the initial questions we had about our data set we performed multiple different tests and analysis of our models . Where the Site model was a linear model that used Site, Chest, Head Length and Tail Length as predictor variables with the response variable being Total Length. The Population model was a similar linear model that only used Population, Tail Length, and Head Length as predictors and Total Length as the response.
 
-To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ . Which indicates that the difference between models is statically significant at an alpha level of 0.05
+First we conducted an anova test to see how if the inclusion of Population and Site variables were producing statically significant different models. Essentially, we were checking to see how the addition of a categorical variable was affecting the model. We tested models that included either Site or Population as their categorical variable, for the model that contained site our anova produced a p-value of $7.604e^{-11}$ . What that means is that the inclusion of Site in our model along with Chest, Head Length, and Tail length, that Site is a statstically significant predictor variable. Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$. Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable. The results of the anova tests are show below.
 
 ```{r,echo = FALSE}
 #confidence intervals of model
-print(confint(multReg, level =0.95))
 multReg = lm(totlngth ~ site+ chest +hdlngth+ taill, data = data)
 noGroup = lm(totlngth ~ chest + hdlngth+ taill , data = data)
 anova(multReg, noGroup)
-
 ```
 
 ```{r, echo = FALSE}
-data$sexm = ifelse(data$sex == "m", 1,0)
-data$sexf = ifelse(data$sex == "f", 1,0)
 Pop_model_no_group = lm(totlngth ~ hdlngth+ taill, data = data)
 Pop_model = lm(totlngth ~ hdlngth+ taill +Pop, data = data)
-print(confint(Pop_model, level =0.95))
 anova(Pop_model_no_group,Pop_model)
 
-summary(Pop_model)
+```
+
+To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ . Which indicates that the difference between models is statically significant at an alpha level of 0.05. The test is show below.
+
+```{r, echo = FALSE}
+anova(multReg,Pop_model)
+```
+
+Now that we have compared model we can look at how the actual models are structured. For this section we will compare the predictor variables that both models have(Tail Length and Head Length) and what effect they have have and compare the difference categorical variables make in the models.
+
+Starting with the Site model we can interpret the Tail Length as, holding all else constant we expect that on average for every 1 centimeter increase in Tail Length we expect the Total Length to increase by 1.19337 centimeters. Also, holding all else constant we expect that on average for every 1 millimeter increase in Head Length we expect the Total Length to increase by 0.40183 centimeters. We now give a generalization about the site factor, since all the coefficients of determination for each site is negative we acknowledge that each site has significant effect had on the Total Length of a possum. We note that the holding all else constant the site factor will always decrease the Total Length of the possum in comparison to the reference Site(Site 1). We note specifically that Site 3 has the smallest effect on Total Length and that Site 7 has the largest effect. All the coefficients can be seen below.
+
+With the Population model we can interpret the Tail Length as, holding all else constant we expect that on average for every 1 centimeter increase in Tail Length we expect the Total Length to increase by 1.34791 centimeters. Also, holding all else constant we expect that on average for every 1 millimeter increase in Head Length we expect the Total Length to increase by 0.57126 centimeters. For the categorical variable it can be interpreted as, holding all else constant a possum belonging to the Vic population is expected on average to have a Total length 3.53716 centimeters greater than a possum from the "Other" population.
+
+```{r}
+summary(multReg)
 ```
 
 ```{r}
-anova(multReg,Pop_model)
+summary(Pop_model)
+```
+
+Lastly we have created 95% confidence intervals for both models, to help determine the effect of predictor variables even further.
+
+With the Site model having categorical variable with 6 levels we start there. Once again, we make a generalization of the results. With all of the site confidence interval being negative and all of them spanning a similar distance. We can assume,holding all else constant, with 95% confidence that the true value for each of the Sites is within the upper and lower bound of the confidence intervals produced below. We also see that none of the confidence intervals contain 0, which allows us to infer that the Site variable will always result in a decrease in the Total Length of a possum. We can further interpret the confidence interval for Head Length to mean that we are 95% confident that the true effect of increase in Head Length has on Total Length lies between 0.24512254 and 0.5585335. We are also 95% confident that holding all else constant the true effect of Tail Length on Total Length lies between 0.94229399 and 1.444456. We also are 95% confident that holding all else constant that the true effect of Chest on Total Length lies between -0.07118978 and 0.4579026. Since the confidence interval contains 0 we recognize that Chest might not have any statistically significant effect on Total Length, at the significance level of 5%.
+
+Now we look at the Population model. We are 95% confident that holding all else constant that the true effect of Tail Length on Total Length is between 1.0799613 and 1.6158617. We are also 95% confident that holding all else constant the true effect of Head Length on Total Length is between 0.4395157 and 0.7030028. Finally we are 95% confident that holding all else constant that the true effect of a possum being part of the Vic Population has on the Total Length is between 2.5141664 and 4.5601573.
+
+```{r}
+print(confint(Pop_model, level =0.95))
+print(confint(multReg, level =0.95))
 
 ```
 
 # 3 Conclusions
 
-Give additional context to you results and interpretations from Section 5 with respect to the data set and its purpose. Describe any potential weaknesses in your analysis, and how they may affect the reliability of the results.
+*Give additional context to you results and interpretations from Section 5 with respect to the data set and its purpose. Describe any potential weaknesses in your analysis, and how they may affect the reliability of the results.*
+
+We have created all these models and scores and interpretations of models. If anyone who wasn't a statistician looked at it they wouldn't understand what it means. So we'll put it into terms that the average person would understand. We had two problems we wanted to answer, can we use the site a possum was captured at to determine the total length of the possum, and is there a difference between the sub population of a possum and the site a possum was captured at, when explaining the total length of a possum. The first question we used a method of linear regression to determine that we can explain roughly 80% of the variation in a possums length when we use the site of its capture. The second question can be answered in a similar fashion, there is a difference in using the sub population compared to the Site of a possums capture when explaining the variation in total length. Those are the simple answers to the questions we asked, the next section will have a more in depth analysis of the findings, a fair warning that it is not for the faint of heart.
+
+Starting with the anova between models that either had or didn't have Site as a categorical predictor variable. The test resulted in a p-value well below the significance level of 0.05 which meant they were statically significantly different. Comparing the model summaries we saw when Site was included we had an $R^2 =.80$ compared to the other model which returned $R^2 = .64$ . Including the categorical variable of site allowed for us to explain roughly 16% more of the data. Additionally when comparing models where the categorical predictor variable was Site and Population we performed an anova test which returned results that indicated there was a statically significant difference. The Population model had an $R^2 =.73$ which compare to the aforementioned value of the Site model was lesser. We also compared the Site model's $Adjusted\ R^2 =.79$ with the Population's $Adjusted\ R^2 =.72$ . Using both those metrics the Site model was able to explain more of the data while still being better suited to generalize potential new data. We believe the reason for this difference most likely is related to the Site's possums were captured at. If a site had more food or a harsher environment it would make sense that the possums would be larger there, due to abundance of nutrients or to fend off predators. However, since we have no additional data we are merely speculating on the potential reason why Site as a predictor variable allowed models to perform better.
+
+There are some points we felt should be brought up as potentially concerning. Firstly, we wanted to try testing an interaction term between Population and Site, we were unable to do so as the multicolinearity between the two variables was unbelievably high. Also when constructing confidence intervals for the coefficients of the Site model zero was included in the interval for the Chest variable. This typically indicates that the variable is not statically significant in the model, but since the interval was only 0.07 below zero we determined that it was acceptable to keep it in our model.
 
 # 4 Contributions
 
