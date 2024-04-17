@@ -1,6 +1,6 @@
 ---
 title: "Final Project Template"
-author: Dr. Sandholtz
+author: Jake Truman, Isaih Barron, and Will Martin
 output: pdf_document
 ---
 
@@ -54,9 +54,9 @@ Question 2: Is there a difference between using a the site a possum was captured
 
 To determine if the site of a possum's capture has an effect on the total length of the possum we implemented a multiple linear regression model. Using the site a possum was caught at, the chest size of the possum, the head length, the tail length. Using best subset with a metric of AIC as the variable selection method is how we determined which variables to build our model on. Since site is categorical variable we encode it as a factor and proceed to check assumptions.
 
-Since the linear model we are going to be using to fit explore this data can be used to answer both questions we conduct the explorarity data analysis for both questions here.
+Since the linear model we are going to be using to fit explore this data can be used to answer both questions we conduct the exploratory data analysis for both questions here.
 
-We first checked for multicolinearity using a correlation matrix, once satisfied that multicolinearty would not be an issue, we fit a tentative model and used it to find and save the residual values. Conducting a more thorough inspection of variables and their correlation we performed some variable inflation factor calculations. The mean of the VIFs was 1.90 and the max VIF was 2.08, both indicate that we can continue the analysis under the assumption that the no multicolinearity is met. Another assumption we check was that the residuals are normally distributed, creating a density plot we are able to see that they are shaped like a normal distribution, and continue noting that this assumption was met. We performed other checks on residuals as well and the accompanying plots are show below. Finally we checked for influential points, using a Cook's distance plot we were able to see that all data points were within bounds meaning that none of them could be considered influential.
+We first checked for multicolinearity using a correlation matrix, once satisfied that multicolinearty would not be an issue, we fit a tentative model and used it to find and save the residual values. Conducting a more thorough inspection of variables and their correlation we performed some variable inflation factor calculations. The mean of the VIFs was 1.90 and the max VIF was 2.08(see Figure 3), both indicate that we can continue the analysis under the assumption that the no multicolinearity is met. Another assumption we check was that the residuals are normally distributed, creating a density plot we are able to see that they are shaped like a normal distribution(see Figure 2), and continue noting that this assumption was met. We performed other checks on residuals as well and the accompanying plots are show below. Finally we checked for influential points, using a Cook's distance plot(see Figure 1) we were able to see that all data points were within bounds meaning that none of them could be considered influential.
 
 ```{r, echo = FALSE}
 data = read.csv("possum.csv", sep =",")
@@ -82,15 +82,15 @@ avPlots(multReg)
 
 # 2 Analyses, Results, and Interpretation
 
-To answer the initial questions we had about our data set we performed multiple different tests and analysis of our models . Where the Site model was a linear model that used Site, Chest, Head Length and Tail Length as predictor variables with the response variable being Total Length. The Population model was a similar linear model that only used Population, Tail Length, and Head Length as predictors and Total Length as the response.
+To answer the initial questions we had about our data set we performed multiple different tests and analysis of our models . Where the Site model was a linear model that used Site, Chest, Head Length and Tail Length as predictor variables with the response variable being Total Length(see Figure 4). The Population model was a similar linear model that only used Population, Tail Length, and Head Length as predictors and Total Length as the response(see Figure 5).
 
-First we conducted an anova test to see how if the inclusion of Population and Site variables were producing statically significant different models. Essentially, we were checking to see how the addition of a categorical variable was affecting the model. We tested models that included either Site or Population as their categorical variable, for the model that contained site our anova produced a p-value of $7.604e^{-11}$ . What that means is that the inclusion of Site in our model along with Chest, Head Length, and Tail length, that Site is a statstically significant predictor variable. Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$. Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable. The results of the anova tests are show below.
+First we conducted an anova test to see how if the inclusion of Population and Site variables were producing statically significant different models. Essentially, we were checking to see how the addition of a categorical variable was affecting the model. We tested models that included either Site or Population as their categorical variable, for the model that contained site our anova produced a p-value of $7.604e^{-11}$ (see Figure 6). What that means is that the inclusion of Site in our model along with Chest, Head Length, and Tail length, that Site is a statistically significant predictor variable. Next we tested the inclusion of Population in the model, and the anova resulted in a p-value of $6.395^{-10}$ (see Figure 7). Which indicates that a model with Tail Length and Head Length, that Population is a statically significant predictor variable. The results of the anova tests are show below.
 
-To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ . Which indicates that the difference between models is statically significant at an alpha level of 0.05. The test is show below.
+To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ (see Figure 9). Which indicates that the difference between models is statically significant at an alpha level of 0.05. The test is show below.
 
 Now that we have compared model we can look at how the actual models are structured. For this section we will compare the predictor variables that both models have(Tail Length and Head Length) and what effect they have have and compare the difference categorical variables make in the models.
 
-Starting with the Site model we can interpret the Tail Length as, holding all else constant we expect that on average for every 1 centimeter increase in Tail Length we expect the Total Length to increase by 1.19337 centimeters. Also, holding all else constant we expect that on average for every 1 millimeter increase in Head Length we expect the Total Length to increase by 0.40183 centimeters. We now give a generalization about the site factor, since all the coefficients of determination for each site is negative we acknowledge that each site has significant effect had on the Total Length of a possum. We note that the holding all else constant the site factor will always decrease the Total Length of the possum in comparison to the reference Site(Site 1). We note specifically that Site 3 has the smallest effect on Total Length and that Site 7 has the largest effect. All the coefficients can be seen below.
+Starting with the Site model we can interpret the Tail Length as, holding all else constant we expect that on average for every 1 centimeter increase in Tail Length we expect the Total Length to increase by 1.19337 centimeters. Also, holding all else constant we expect that on average for every 1 millimeter increase in Head Length we expect the Total Length to increase by 0.40183 centimeters. We now give a generalization about the site factor, since all the coefficients of determination for each site is negative we acknowledge that each site has significant effect had on the Total Length of a possum. We note that the holding all else constant the site factor will always decrease the Total Length of the possum in comparison to the reference Site(Site 1). We note specifically that Site 3 has the smallest effect on Total Length and that Site 7 has the largest effect. Going forward all the interpretations of confidence intervals will come from the data in Figure 10.
 
 With the Population model we can interpret the Tail Length as, holding all else constant we expect that on average for every 1 centimeter increase in Tail Length we expect the Total Length to increase by 1.34791 centimeters. Also, holding all else constant we expect that on average for every 1 millimeter increase in Head Length we expect the Total Length to increase by 0.57126 centimeters. For the categorical variable it can be interpreted as, holding all else constant a possum belonging to the Vic population is expected on average to have a Total length 3.53716 centimeters greater than a possum from the "Other" population.
 
@@ -116,7 +116,7 @@ For each member of the group, write a short paragraph describing their contribut
 
 ### Figure 1
 
-```{r}
+```{r,echo=FALSE}
 cd_cont_pos <- function(leverage, level, model) {sqrt(level*length(coef(model))*(1-leverage)/leverage)}
 cd_cont_neg <- function(leverage, level, model) {-cd_cont_pos(leverage, level, model)}
 
@@ -133,7 +133,7 @@ autoplot(multReg, which = 5) +
 
 ### Figure 2
 
-```{r}
+```{r,echo=FALSE}
 ggplot(data = data) +
   geom_histogram(aes(x = Residuals, y = after_stat(density)), 
                  binwidth = 4) +
@@ -144,43 +144,63 @@ ggplot(data = data) +
 
 ### Figure 3
 
-```{r}
-multReg = lm(totlngth ~ site+ chest +hdlngth+ taill, data = data)
-noGroup = lm(totlngth ~ chest + hdlngth+ taill , data = data)
-anova(multReg, noGroup)
+```{r,echo=FALSE}
+vif_values <- car::vif(multReg)
+cat("Mean VIF:",mean(vif_values))
+print("Individual VIFS")
+print(vif_values)
 ```
 
 ### Figure 4
 
-```{r}
-Pop_model_no_group = lm(totlngth ~ hdlngth+ taill, data = data)
-Pop_model = lm(totlngth ~ hdlngth+ taill +Pop, data = data)
-anova(Pop_model_no_group,Pop_model)
-
+```{r,echo=FALSE}
+multReg = lm(totlngth ~ site+ chest +hdlngth+ taill, data = data)
+summary(multReg)
 ```
 
 ### Figure 5
 
-```{r}
-anova(multReg,Pop_model)
+```{r,echo=FALSE}
+noGroup = lm(totlngth ~ chest + hdlngth+ taill , data = data)
+anova(multReg, noGroup)
 ```
 
 ### Figure 6
 
-```{r}
+```{r,echo=FALSE}
+Pop_model = lm(totlngth ~ hdlngth+ taill +Pop, data = data)
 summary(Pop_model)
 ```
 
 ### Figure 7
 
-```{r}
-summary(multReg)
+```{r,echo=FALSE}
+Pop_model_no_group = lm(totlngth ~ hdlngth+ taill, data = data)
+anova(Pop_model_no_group,Pop_model)
 ```
 
 ### Figure 8
 
-```{r}
-print(confint(Pop_model, level =0.95))
-print(confint(multReg, level =0.95))
+```{r,echo=FALSE}
+vif_values <- car::vif(Pop_model)
+cat("Mean VIF:",mean(vif_values))
 
+print("Individual VIFS")
+print(vif_values)
+```
+
+### Figure 9
+
+```{r,echo=FALSE}
+
+anova(multReg,Pop_model)
+```
+
+### Figure 10
+
+```{r,echo=FALSE}
+print("Population Model Confidecnce Interval")
+print(confint(Pop_model, level =0.95))
+print("Site Model Confidecnce Interval")
+print(confint(multReg, level =0.95))
 ```
