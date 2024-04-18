@@ -38,11 +38,10 @@ Our data set involves the measurements of a species of possum over seven sites i
 
 Briefly state the source of your data and describe the relevant variables that **you will use** in your project. Include important details such as units for the different variables, and what the \`\`observational units" (rows in the data set) represent (e.g., individuals, countries, etc.)
 
-It is important to sample animal populations as it allows us to monitor the status of a species. This information lends to important conclusions that may explain trends in an ecosystem's health. Biologists are able to use the information collected from animals to asses the behavioral patterns of animals, as well as the dynamics of the population. Ultimately, this possum data set aids in the management and protection of these possum and their habitats.
-Down below is a table of data. In this analysis, the relevant variables are *case, site, Pop, hdlngth, totlngth, taill*.
+It is important to sample animal populations as it allows us to monitor the status of a species. This information lends to important conclusions that may explain trends in an ecosystem's health. Biologists are able to use the information collected from animals to asses the behavioral patterns of animals, as well as the dynamics of the population. Ultimately, this possum data set aids in the management and protection of these possum and their habitats. Down below is a table of data. In this analysis, the relevant variables are *case, site, Pop, hdlngth, totlngth, taill*.
 
 | Variable | Description                                                                                                         |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | case     | Observation Number                                                                                                  |
 | site     | The site number where the possum was trapped                                                                        |
 | Pop      | Population: either Vic (Victoria) or other (New South Wales or Queensland)                                          |
@@ -144,6 +143,8 @@ In summary, our study explored the influencing factors of a possums Total Length
 For each member of the group, write a short paragraph describing their contribution to this project and the report. It is up to you to decide how to divide up the work, so long as everyone is contributing approximately equally.
 
 The work was pretty evenly distrubted
+
+Will and Isaish kind of broke jakes back but its chill
 
 ## APPENDIX
 
