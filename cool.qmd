@@ -28,6 +28,7 @@ library(caret)
 library(ggplot2)
 library(ggfortify)
 library(car)
+library(patchwork)
 ```
 
 # Abstract
@@ -62,11 +63,27 @@ For the questions, to determine if and how the site of a possum's capture has an
 After some exploratory data analysis, an interesting thing found in regards to the first question are the box plots relating the population and site a possum is from to the same possum's total length. As shown in the box plots for populations, there is not much of a difference between the different populations; however, some of the box plots for site a noticeably different, like sites two and four. (Additionally, a summary for the data is given in Figure 11. This suggests that using *site* may be more useful.
 
 ```{r}
-ggplot(data, aes(x = Pop, y = totlngth)) +
+# Read and Format the Data
+data = read.csv("possum.csv", sep =",")
+data = data.frame(data)
+data = na.omit(data)
+data = data[,-1]
+data$Pop = factor(data$Pop, levels = c("other","Vic"))
+data$sex = factor(data$sex, levels = c("m","f"))
+data$site = factor(data$site, levels = c("1","2","3","4","5","6","7","8","9","10"))
+data = data %>% relocate(totlngth, .after = belly)
+
+y=(data$sex)
+X=as.matrix(data[, 2:13])
+
+pop_plot <- ggplot(data, aes(x = Pop, y = totlngth)) +
   geom_boxplot()
 
-ggplot(data, aes(x = site, y = totlngth)) +
+site_plot <- ggplot(data, aes(x = site, y = totlngth)) +
   geom_boxplot()
+
+(pop_plot) /
+(site_plot)
 ```
 
 Since the linear model be used to explore this data can be used to answer both questions, exploratory data analysis on this data set and a model with the variables given above is discussed below.
@@ -88,21 +105,6 @@ Next is checking that there is no multicollinearity among the predictor variable
 Finally is the check for influential points. Looking at both residuals vs. leverage plots (see Figure 1 and plot below), all data points were within bounds (less than `0.5`), meaning that none of them could be considered influential.
 
 ```{r, echo = FALSE}
-# Read and Format the Data
-data = read.csv("possum.csv", sep =",")
-data = data.frame(data)
-data = na.omit(data)
-data = data[,-1]
-data$Pop = factor(data$Pop, levels = c("other","Vic"))
-data$sex = factor(data$sex, levels = c("m","f"))
-data$site = factor(data$site, levels = c("1","2","3","4","5","6","7","8","9","10"))
-data = data %>% relocate(totlngth, .after = belly)
-
-summary(data)
-
-y=(data$sex)
-X=as.matrix(data[, 2:13])
-
 # Fit the Model
 multReg = lm(totlngth ~ site + chest + hdlngth + taill, data = data)
 data$Residuals = multReg$residuals
