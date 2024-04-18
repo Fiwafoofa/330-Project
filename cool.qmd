@@ -39,7 +39,7 @@ Our data set involves the measurements of a species of possum over seven sites i
 It is important to sample animal populations as it allows us to monitor the status of a species. This information lends to important conclusions that may explain trends in an ecosystem's health. Biologists are able to use the information collected from animals to asses the behavioral patterns of animals, as well as the dynamics of the population. Ultimately, this possum data set aids in the management and protection of these possum and their habitats. Down below is a table of data. In this analysis, the relevant variables are *case, site, Pop, hdlngth, totlngth, taill*.
 
 | Variable | Description                                                                |
-|------------------------|------------------------------------------------|
+|------------------------|-----------------------------------------------|
 | case     | Observation Number                                                         |
 | site     | The site number where the possum was trapped                               |
 | Pop      | Population: either Vic (Victoria) or other (New South Wales or Queensland) |
@@ -58,6 +58,16 @@ Question 2: Does the site where a possum was captured have an effect on the tota
 ## 1.3 Regression Methods
 
 To determine if the site of a possum's capture has an effect on the total length of the possum, a multiple linear regression model was fit using the *site* a possum was caught at, and the *chest* *size*, *head length*, and *tail length o*f a possum as predictor variables. The best subset variable selection method with the AIC metric was used to determined which variables to build the model on. Since *site* is categorical variable, it was encoded as a factor.
+
+After some exploratory data analysis, an interesting thing found in regards to the first question are the box plots relating the population and site a possum is from to the same possum's total length. As shown in the box plots for populations, there is not much of a difference between the different populations; however, some of the box plots for site a noticeably different, like sites two and four. (Additionally, a summary for the data is given in Figure 11. This suggests that using *site* may be more useful.
+
+```{r}
+ggplot(data, aes(x = Pop, y = totlngth)) +
+  geom_boxplot()
+
+ggplot(data, aes(x = site, y = totlngth)) +
+  geom_boxplot()
+```
 
 Since the linear model be used to explore this data can be used to answer both questions, exploratory data analysis on this data set and a model with the variables given above is discussed below.
 
@@ -87,6 +97,9 @@ data$Pop = factor(data$Pop, levels = c("other","Vic"))
 data$sex = factor(data$sex, levels = c("m","f"))
 data$site = factor(data$site, levels = c("1","2","3","4","5","6","7","8","9","10"))
 data = data %>% relocate(totlngth, .after = belly)
+
+summary(data)
+
 y=(data$sex)
 X=as.matrix(data[, 2:13])
 
@@ -233,4 +246,10 @@ print("Population Model Confidecnce Interval")
 print(confint(pop_model, level =0.95))
 print("Site Model Confidecnce Interval")
 print(confint(site_model, level =0.95))
+```
+
+### Figure 11
+
+```{r}
+summary(data)
 ```
