@@ -1,5 +1,5 @@
 ---
-title: "Final Project Template"
+title: "Possum Final Project "
 author: Jake Truman, Isaih Barron, and Will Martin
 output: pdf_document
 ---
@@ -38,10 +38,10 @@ Our data set involves the measurements of a species of possum over seven sites i
 
 Briefly state the source of your data and describe the relevant variables that **you will use** in your project. Include important details such as units for the different variables, and what the \`\`observational units" (rows in the data set) represent (e.g., individuals, countries, etc.)
 
-Our data was collected by wildlife researchers, on Southern Victoria to central Queensland
+Our data was collected by wildlife researchers, on Southern Victoria to central Queensland. Down below is a table of data. In this analysis, the relevant variables are *case, site, Pop, hdlngth, totlngth, taill*.
 
 | Variable | Description                                                                                                         |
-|-------------------|-----------------------------------------------------|
+|--------------------|----------------------------------------------------|
 | case     | Observation Number                                                                                                  |
 | site     | The site number where the possum was trapped                                                                        |
 | Pop      | Population: either Vic (Victoria) or other (New South Wales or Queensland)                                          |
@@ -50,7 +50,7 @@ Our data was collected by wildlife researchers, on Southern Victoria to central 
 | hdlngth  | Head length in millimeters (mm)                                                                                     |
 | totlngth | Total length in centimeters (cm)                                                                                    |
 | taill    | Tail length in centimeters (cm)                                                                                     |
-| footlgth | Foot length (units unspecified)                                                                                     |
+| *.*th    | Foot length (units unspecified)                                                                                     |
 | earconch | A measurement (units and dimensions not specified) of an the possum's ear conch (outer, shell-like part of the ear) |
 | eye      | A measurement (units and dimensions not specified) of a possum's eye)                                               |
 | chest    | A measurement (units and dimensions not specified) of a possum's chest)                                             |
@@ -58,9 +58,11 @@ Our data was collected by wildlife researchers, on Southern Victoria to central 
 
 ## 1.2 Questions of Interest
 
-Question 1: Does the site of a possum's capture have an effect on the total length of the possum.
+For this data set, there are two questions of interest:
 
-Question 2: Is there a difference between using a the site a possum was captured at compared to the population the possum belongs to.
+Question 1: Does the site where a possum was captured have an effect on the total length of the possum.
+
+Question 2: Is there a difference between using a the site a possum was captured compared to the population the possum belongs to.
 
 ## 1.3 Regression Methods
 
@@ -76,7 +78,7 @@ Next is the assumption that the residuals of the model are normally distributed.
 
 For the equal and constant variance assumption, looking at the scale-location plot, the line is somewhat straight and the points are evenly distributed across it. Additionally, looking at the Q-Q plot, most of points follow the diagonal line closely except for the lower theoretical quantiles. This is potentially concerning, but as most values follow diagonal line and the scale-location plot looks mostly good, this is assumption is likely met
 
-The first assumption checked is no multicollinearity among the predictor variables. The correlation matrix and VIFs were computed. In the correlation matrix, none of the variables have a higher correlation than `0.8`, which is ideal, and the mean and max of the VIFs was `1.90` and `2.08` respectively, which is less ideal but likely still good enough. The assumption is likely met and will not interfere much with the predictions of the model.
+Next is checking that there is no multicollinearity among the predictor variables. The correlation matrix and VIFs were computed. In the correlation matrix, none of the variables have a higher correlation than `0.8`, which is ideal, and the mean and max of the VIFs was `1.90` and `2.08` respectively, which is less ideal but likely still good enough. The assumption is likely met and will not interfere much with the predictions of the model.
 
 Finally is the check for influential points. Looking at both residuals vs. leverage plots, all data points were within bounds (less than `0.5`), meaning that none of them could be considered influential.
 
@@ -89,13 +91,19 @@ data$Pop = factor(data$Pop, levels =c("other","Vic"))
 data$sex = factor(data$sex, levels =c("m","f"))
 data$site = factor(data$site, levels =c("1","2","3","4","5","6","7","8","9","10"))
 data = data %>% relocate(totlngth, .after =belly)
+
+summary(data)
+
 y=(data$sex)
 X=as.matrix(data[, 2:13])
 
 multReg = lm(totlngth ~ site+ chest +hdlngth+ taill, data = data)
 data$Residuals = multReg$residuals
 data$fitted = multReg$fitted.values
+
 autoplot(multReg)
+
+
 avPlots(multReg)
 
 ```
@@ -106,7 +114,7 @@ To answer the initial questions about our data set, an analysis and different te
 
 First, an anova test was conducted to see if the inclusion of the *population* and *site* variables were producing statically significant different models. (In other words, checking to see how the addition of a categorical variable, *population* or *site*, was affecting the model.) For the models that did and did not contain site, the anova analysis produced a p-value of $7.604e^{-11}$ suggesting that the inclusion of *site* in our model (along with *chest*, *head* *length*, and *tail* *length*) is a statistically significant predictor variable (See Figure 5). Next, the inclusion of *population* in the Population model was tested. The anova analysis resulted in a p-value of $6.395^{-10}$, thus indicating that a model with just *tail length* and *head length*, *population* is a statically significant predictor variable (See Figure 7). The results of the anova tests are show below.
 
-To further understand the relationship that Site and Population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ . Which indicates that the difference between models is statically significant at an alpha level of 0.05. The test is show below.
+To further understand the relationship that site and population have as predictor variables in a linear model we conducted an anova test compare models that each contained the respective variables as predictors. The anova resulted in a p-value of $2.747e^{-5}$ . Which indicates that the difference between models is statically significant at an alpha level of 0.05. The test is show below.
 
 Now that we have compared model we can look at how the actual models are structured. For this section we will compare the predictor variables that both models have(Tail Length and Head Length) and what effect they have have and compare the difference categorical variables make in the models.
 
@@ -126,13 +134,15 @@ We have created all these models and scores and interpretations of models. If an
 
 Starting with the anova between models that either had or didn't have Site as a categorical predictor variable. The test resulted in a p-value well below the significance level of 0.05 which meant they were statically significantly different. Comparing the model summaries we saw when Site was included we had an $R^2 =.80$ compared to the other model which returned $R^2 = .64$ . Including the categorical variable of site allowed for us to explain roughly 16% more of the data. Additionally when comparing models where the categorical predictor variable was Site and Population we performed an anova test which returned results that indicated there was a statically significant difference. The Population model had an $R^2 =.73$ which compare to the aforementioned value of the Site model was lesser. We also compared the Site model's $Adjusted\ R^2 =.79$ with the Population's $Adjusted\ R^2 =.72$ . Using both those metrics the Site model was able to explain more of the data while still being better suited to generalize potential new data. We believe the reason for this difference most likely is related to the Site's possums were captured at. If a site had more food or a harsher environment it would make sense that the possums would be larger there, due to abundance of nutrients or to fend off predators. However, since we have no additional data we are merely speculating on the potential reason why Site as a predictor variable allowed models to perform better.
 
-There are some points we felt should be brought up as potentially concerning. Firstly, we wanted to try testing an interaction term between Population and Site, we were unable to do so as the multicolinearity between the two variables was unbelievably high. Also when constructing confidence intervals for the coefficients of the Site model zero was included in the interval for the Chest variable. This typically indicates that the variable is not statically significant in the model, but since the interval was only 0.07 below zero we determined that it was acceptable to keep it in our model.
+There are some points we felt should be brought up as potentially concerning. First, we wanted to try testing an interaction term between Population and Site, we were unable to do so as the multicolinearity between the two variables was unbelievably high. Also when constructing confidence intervals for the coefficients of the Site model zero was included in the interval for the Chest variable. This typically indicates that the variable is not statically significant in the model, but since the interval was only 0.07 below zero we determined that it was acceptable to keep it in our model.
 
 In summary, our study explored the influencing factors of a possums Total Length, specifically examining the capture site and sub population variables. Our analysis, using multiple linear regression models, uncovered insight into the relationship between these variables. The implications of the findings suggest that the environment and conditions of a
 
 # 4 Contributions
 
 For each member of the group, write a short paragraph describing their contribution to this project and the report. It is up to you to decide how to divide up the work, so long as everyone is contributing approximately equally.
+
+The work was pretty evenly distrubted
 
 ## APPENDIX
 
