@@ -32,13 +32,13 @@ library(car)
 
 # Abstract
 
-Our data set involves the measurements of a species of possum over seven sites in Australia, ranging from Southern Victoria to Queensland, which encompasses almost all of Australia's eastern coast.
+Our data set involves the measurements of a species of possum over seven sites in Australia, ranging from Southern Victoria to Queensland, which encompasses almost all of Australia's eastern coast. In this analysis, our goal is to create a model capable of accurately predicting the total length of a possum based on key characteristics such as location, sex, age, etc. With this, we will be able to analyze trends in the data, which may reveal how the possums in specific areas interact with their environment.
 
 ## 1.1 Data Description
 
 Briefly state the source of your data and describe the relevant variables that **you will use** in your project. Include important details such as units for the different variables, and what the \`\`observational units" (rows in the data set) represent (e.g., individuals, countries, etc.)
 
-Our data was collected by wildlife researchers, on Southern Victoria to central Queensland
+It is important to sample animal populations as it allows us to monitor the status of a species. This information lends to important conclusions that may explain trends in an ecosystem's health. Biologists are able to use the information collected from animals to asses the behavioral patterns of animals, as well as the dynamics of the population. Ultimately, this possum data set aids in the management and protection of these possum and their habitats.
 
 | Variable | Description                                                                                                         |
 |-------------------|-----------------------------------------------------|
