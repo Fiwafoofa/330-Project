@@ -57,7 +57,7 @@ Question 2: Does the site where a possum was captured have an effect on the tota
 
 ## 1.3 Regression Methods
 
-To determine if the site of a possum's capture has an effect on the total length of the possum, a multiple linear regression model was fit using the *site* a possum was caught at, and the *chest* *size*, *head length*, and *tail length o*f a possum as predictor variables. The best subset variable selection method with the AIC metric was used to determined which variables to build the model on. Since *site* is categorical variable, it was encoded as a factor.
+For the questions, to determine if and how the site of a possum's capture has an effect on the total length of the possum, a multiple linear regression model was fit using the *site* a possum was caught at and the *chest* *size*, *head length*, and *tail length o*f a possum as the predictor variables in addition to another model with the same variables except *site* is swapped with the population the possum is from. The best subset variable selection method with the AIC metric was used to determined which variables to build the model on. Since *site* is categorical variable, it was encoded as a factor.
 
 After some exploratory data analysis, an interesting thing found in regards to the first question are the box plots relating the population and site a possum is from to the same possum's total length. As shown in the box plots for populations, there is not much of a difference between the different populations; however, some of the box plots for site a noticeably different, like sites two and four. (Additionally, a summary for the data is given in Figure 11. This suggests that using *site* may be more useful.
 
@@ -116,7 +116,6 @@ shapiro.test(data$Residuals)
 
 # LINE Assumptions and Influential Points
 autoplot(multReg)
-
 ```
 
 ## Analysis Details and Interpretation
@@ -211,7 +210,7 @@ anova(site_model, no_site_model)
 ### Figure 6
 
 ```{r,echo=FALSE}
-pop_model = lm(totlngth ~ hdlngth+ taill + Pop, data = data)
+pop_model = lm(totlngth ~ hdlngth + taill + Pop, data = data)
 summary(pop_model)
 ```
 
