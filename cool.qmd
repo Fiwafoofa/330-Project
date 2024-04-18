@@ -23,7 +23,7 @@ text-align: center;
 library(bestglm)
 library(dplyr)
 library(gridExtra)
-library("corrplot")
+library(corrplot)
 library(caret)
 library(ggplot2)
 library(ggfortify)
@@ -38,22 +38,14 @@ Our data set involves the measurements of a species of possum over seven sites i
 
 It is important to sample animal populations as it allows us to monitor the status of a species. This information lends to important conclusions that may explain trends in an ecosystem's health. Biologists are able to use the information collected from animals to asses the behavioral patterns of animals, as well as the dynamics of the population. Ultimately, this possum data set aids in the management and protection of these possum and their habitats. Down below is a table of data. In this analysis, the relevant variables are *case, site, Pop, hdlngth, totlngth, taill*.
 
-| Variable | Description                                                                                                         |
-|-----------------------|-------------------------------------------------|
-| case     | Observation Number                                                                                                  |
-| site     | The site number where the possum was trapped                                                                        |
-| Pop      | Population: either Vic (Victoria) or other (New South Wales or Queensland)                                          |
-| sex      | Gender, either m (male) or f (female)                                                                               |
-| age      | Age (units unspecified, likely years)                                                                               |
-| hdlngth  | Head length in millimeters (mm)                                                                                     |
-| skullw   | Skull width in millimeters (mm)                                                                                     |
-| totlngth | Total length in centimeters (cm)                                                                                    |
-| taill    | Tail length in centimeters (cm)                                                                                     |
-| footlgth | Foot length (units unspecified)                                                                                     |
-| earconch | A measurement (units and dimensions not specified) of an the possum's ear conch (outer, shell-like part of the ear) |
-| eye      | A measurement (units and dimensions not specified) of a possum's eye)                                               |
-| chest    | A measurement (units and dimensions not specified) of a possum's chest)                                             |
-| belly    | A measurement (units and dimensions not specified) of a possum's belly)                                             |
+| Variable | Description                                                                |
+|------------------------|------------------------------------------------|
+| case     | Observation Number                                                         |
+| site     | The site number where the possum was trapped                               |
+| Pop      | Population: either Vic (Victoria) or other (New South Wales or Queensland) |
+| hdlngth  | Head length in millimeters (mm)                                            |
+| totlngth | Total length in centimeters (cm)                                           |
+| taill    | Tail length in centimeters (cm)                                            |
 
 ## 1.2 Questions of Interest
 
@@ -81,7 +73,7 @@ Next is the assumption that the residuals of the model are normally distributed.
 
 For the equal and constant variance assumption, looking at the scale-location plot, the line is somewhat straight and the points are evenly distributed across it. Additionally, looking at the Q-Q plot, most of points follow the diagonal line closely except for the lower theoretical quantiles. This is potentially concerning, but as most values follow diagonal line and the scale-location plot looks mostly good, this is assumption is likely met
 
-Next is checking that there is no multicollinearity among the predictor variables. The correlation matrix and VIFs were computed (see Figure 8 for VIFs). In the correlation matrix down below, none of the variables have a higher correlation than `0.8`, which is ideal, and the mean and max of the VIFs was `1.90` and `2.08` respectively, which is less ideal but likely still good enough. The assumption is likely met and will not interfere much with the predictions of the model.
+Next is checking that there is no multicollinearity among the predictor variables. The correlation matrix (see Figure 8) and VIFs were computed (see Figure 3). In the correlation matrix down, none of the variables have a higher correlation than `0.8`, which is ideal, and the mean and max of the VIFs was `1.90` and `2.89` respectively, which is less ideal but likely still good enough. The assumption is likely met and will not interfere much with the predictions of the model.
 
 Finally is the check for influential points. Looking at both residuals vs. leverage plots (see Figure 1 and plot below), all data points were within bounds (less than `0.5`), meaning that none of them could be considered influential.
 
@@ -106,16 +98,12 @@ data$fitted = multReg$fitted.values
 # Added-Variable Plots (for Linearity)
 avPlots(multReg)
 
-# Histogram of Residuals
+# Normality of Residuals
 shapiro.test(data$Residuals)
 
 # LINE Assumptions and Influential Points
 autoplot(multReg)
 
-# Correlation Plot
-# Exlude site as that is not numeric
-data_subset <- data[c('totlngth', 'chest', 'hdlngth', 'taill')] 
-corrplot(cor(data_subset))
 ```
 
 ## Analysis Details and Interpretation
@@ -136,7 +124,7 @@ Finally, we created 95% confidence intervals for both models. This was done to f
 
 We started with the Site model, which has a categorical variable with 6 levels. Once again, we made a generalization of the results. With all of the Site confidence intervals being negative, and all of them spanning a similar distance, we can assume, holding all else constant, with 95% confidence that the true value for each of the Sites is within the upper and lower bound of the confidence intervals produced below. We also see that none of the confidence intervals contain 0, which allows us to infer that the Site variable will always result in a decrease in the Total Length of a possum. We can interpret the confidence interval for Tail Length as: we are 95% confident that, holding all else constant, the true effect of Tail Length on Total Length lies between `0.94229399` and `1.444456`. Finally, we are 95% confident that, holding all else constant, the true effect of Chest on Total Length lies between `-0.07118978` and `0.4579026`. Since the confidence interval contains 0, we recognize that Chest might not have any statistically significant effect on Total Length, at the significance level of `.05`.
 
-We now look at the Population model. We are 95% confident that, holding all else constant, the true effect of Tail Length on Total Length is between `1.0799613` and `1.6158617`. Finally, we are 95% confident that, holding all else constant, the true effect of a possum being part of the Vic Population on the Total Length is between `2.5141664` and `4.560157`3. We did not include confidence intervals for Head Length in the discussion, due to Head Length being a predictor variable with a relatively low effect on both models. The intervals are still included in Figure 10 in the appendix.
+We now look at the Population model. We are 95% confident that, holding all else constant, the true effect of Tail Length on Total Length is between `1.0799613` and `1.6158617`. Finally, we are 95% confident that, holding all else constant, the true effect of a possum being part of the Vic Population on the Total Length is between `2.5141664` and `4.5601573`. We did not include confidence intervals for Head Length in the discussion, due to Head Length being a predictor variable with a relatively low effect on both models. The intervals are included in Figure 10 in the appendix.
 
 # 3 Conclusions
 
@@ -196,22 +184,22 @@ print(vif_values)
 ### Figure 4
 
 ```{r,echo=FALSE}
-site_model = lm(totlngth ~ site+ chest +hdlngth+ taill, data = data)
+site_model = lm(totlngth ~ site + chest + hdlngth + taill, data = data)
 summary(site_model)
 ```
 
 ### Figure 5
 
 ```{r,echo=FALSE}
-no_site_model = lm(totlngth ~ chest + hdlngth+ taill , data = data)
+no_site_model = lm(totlngth ~ chest + hdlngth + taill , data = data)
 anova(site_model, no_site_model)
 ```
 
 ### Figure 6
 
 ```{r,echo=FALSE}
-pop_model = lm(totlngth ~ hdlngth+ taill +Pop, data = data)
-summary(Pop_model)
+pop_model = lm(totlngth ~ hdlngth+ taill + Pop, data = data)
+summary(pop_model)
 ```
 
 ### Figure 7
@@ -224,11 +212,11 @@ anova(no_pop_model, pop_model)
 ### Figure 8
 
 ```{r,echo=FALSE}
-vif_values <- car::vif(pop_model)
-cat("Mean VIF:",mean(vif_values))
+# Exlude site as that is not numeric
+data_subset <- data[c('totlngth', 'chest', 'hdlngth', 'taill')] 
+corrplot(cor(data_subset))
 
-print("Individual VIFS")
-print(vif_values)
+
 ```
 
 ### Figure 9
